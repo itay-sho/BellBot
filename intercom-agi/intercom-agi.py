@@ -11,6 +11,7 @@ import pathlib
 import tempfile
 import json
 import typing
+import os
 
 
 class UnknownExtensionError(Exception):
@@ -45,7 +46,7 @@ class ReturnValues(enum.Enum):
 
 
 def load_secrets() -> dict:
-    with open(pathlib.Path(r'BellBot/intercom-agi/secrets.json')) as f:
+    with open(pathlib.Path(os.environ.get('AST_AGI_DIR', '') + r'BellBot/intercom-agi/secrets.json')) as f:
         return json.loads(f.read())
 
 
