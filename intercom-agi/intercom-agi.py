@@ -45,7 +45,7 @@ class ReturnValues(enum.Enum):
 
 
 def load_secrets() -> dict:
-    with open('secrets.json') as f:
+    with open(pathlib.Path(r'BellBot/intercom-agi/secrets.json')) as f:
         return json.loads(f.read())
 
 
