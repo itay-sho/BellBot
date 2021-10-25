@@ -67,10 +67,10 @@ def init_telegram_bot(secrets_dict: dict, my_agi: AGI) -> telebot.TeleBot:
     @tb.message_handler(chat_ids=[secrets_dict['chat_id']], commands=['open'])
     def open_door(message):
         tb.reply_to(message, 'DTMF 5 sent. Door should be open')
-        tb.stop_polling()
+        if my_agi is not None:
+            my_agi.appexec('SendDTMF', '55555')
 
-        if agi is not None:
-            agi.appexec('SendDTMF', '55555')
+        tb.stop_polling()
 
     @tb.message_handler(chat_ids=[secrets_dict['chat_id']], commands=['reject'])
     def reject(message):
