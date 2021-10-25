@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 .idea/
-bellbot/secrets.json
+intercom-agi/secrets.json

@@ -4,7 +4,7 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 
 
 def load_secrets() -> dict:
-    with open('secrets.json') as f:
+    with open('../intercom-agi/secrets.json') as f:
         return json.loads(f.read())
 
 
