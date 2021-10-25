@@ -140,6 +140,8 @@ def main() -> int:
             tb.infinity_polling(skip_pending=True)
         finally:
             tb.send_message(secrets_dict['chat_id'], 'Session is over')
+            # marking all previous messages as read
+            tb.get_updates(tb.last_update_id + 1, timeout=1, long_polling_timeout=1)
 
     except FileNotFoundError:
         return ReturnValues.RECORD_FILENAME_NOT_FOUND.value
