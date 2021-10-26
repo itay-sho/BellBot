@@ -12,6 +12,7 @@ import tempfile
 import json
 import typing
 import os
+import signal
 
 
 class UnknownExtensionError(Exception):
@@ -43,6 +44,7 @@ class ReturnValues(enum.Enum):
     UNKNOWN_ERROR = enum.auto()
     RECORD_FILENAME_NOT_FOUND = enum.auto()
     UNKNOWN_RECORD_FILE_SUFFIX = enum.auto()
+    INTERRUPTED_BY_SIGHUP = enum.auto()
 
 
 def load_secrets() -> dict:
@@ -64,6 +66,10 @@ def init_telegram_bot(secrets_dict: dict, my_agi: AGI) -> telebot.TeleBot:
     tb = telebot.TeleBot(secrets_dict['token'])
     tb.threaded = False
 
+    def handle_sighup(signum, frame):
+        tb.stop_polling()
+        exit(ReturnValues.INTERRUPTED_BY_SIGHUP)
+
     @tb.message_handler(chat_ids=[secrets_dict['chat_id']], commands=['open'])
     def open_door(message):
         tb.reply_to(message, 'DTMF 5 sent. Door should be open')
@@ -80,6 +86,9 @@ def init_telegram_bot(secrets_dict: dict, my_agi: AGI) -> telebot.TeleBot:
         tb.stop_polling()
 
     tb.add_custom_filter(ChatFilter())
+
+    # when call terminates there is a sighup that should be handled by stop polling
+    signal.signal(signal.SIGHUP, handle_sighup)
 
     return tb
 
