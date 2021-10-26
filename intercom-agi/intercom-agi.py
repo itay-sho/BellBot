@@ -88,7 +88,11 @@ def init_telegram_bot(secrets_dict: dict, my_agi: AGI) -> telebot.TeleBot:
     tb.add_custom_filter(ChatFilter())
 
     # when call terminates there is a sighup that should be handled by stop polling
-    signal.signal(signal.SIGHUP, handle_sighup)
+    try:
+        signal.signal(signal.SIGHUP, handle_sighup)
+    except AttributeError:
+        # might be cause in Windows since there is no SIGHUP
+        pass
 
     return tb
 
@@ -150,7 +154,7 @@ def main() -> int:
         try:
             tb.infinity_polling(skip_pending=True)
         finally:
-            tb.send_message(secrets_dict['chat_id'], 'Session is over')
+            tb.send_message(secrets_dict['chat_id'], 'Session is over', reply_markup=types.ReplyKeyboardRemove())
             # marking all previous messages as read
             tb.get_updates(tb.last_update_id + 1, timeout=1, long_polling_timeout=1)
 
