@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3.10
+#!/usr/bin/python
 
 from asterisk.agi import *
 from telebot import types, AdvancedCustomFilter
@@ -111,24 +111,24 @@ def _get_response_keyboard() -> types.ReplyKeyboardMarkup:
 
 def get_record_filename_as_m4a() -> str:
     original_filename = sys.argv[Arguments.RECORD_FILENAME.value]
+    suffix = pathlib.Path(original_filename).suffix
 
-    match pathlib.Path(original_filename).suffix:
-        case '.wav':
-            _, output_mp4_filename = tempfile.mkstemp(suffix='.m4a')
+    if suffix == '.wav':
+        _, output_mp4_filename = tempfile.mkstemp(suffix='.m4a')
 
-            out, _ = (
-                ffmpeg
-                .input(original_filename)
-                .output(output_mp4_filename)
-                .overwrite_output()
-                .run(capture_stdout=True, capture_stderr=True)
-            )
+        out, _ = (
+            ffmpeg
+            .input(original_filename)
+            .output(output_mp4_filename)
+            .overwrite_output()
+            .run(capture_stdout=True, capture_stderr=True)
+        )
 
-            return output_mp4_filename
-        case ('.m4a' | '.mp3'):
-            return original_filename
-        case _:
-            raise UnknownExtensionError()
+        return output_mp4_filename
+    elif suffix == '.m4a' or suffix == '.mp3':
+        return original_filename
+    else:
+        raise UnknownExtensionError()
 
 
 def main() -> int:
